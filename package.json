@@ -1,0 +1,15 @@
+{
+  "name": "fake-data-generator",
+  "version": "1.0.0",
+  "description": "A script to generate fake data based on an XLSX template",
+  "main": "generate_fake_data.js",
+  "scripts": {
+    "generate": "node generate_fake_data.js"
+  },
+  "dependencies": {
+    "xlsx": "^0.17.0",
+    "yargs": "^17.3.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
