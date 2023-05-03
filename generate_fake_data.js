@@ -24,8 +24,16 @@ const argv = yargs(hideBin(process.argv))
     description: 'Output XLSX file path',
     type: 'string',
     demandOption: true
+  })
+  .option('f', {
+    alias: 'number-columns',
+    description: 'Array of 0-indexed column indexes for generating number data',
+    type: 'array',
+    default: []
   }).argv;
-  
+  // Step 2: Parse the input column indexes and store them in a Set
+const numberColumns = new Set(argv.f.map(index => parseInt(index, 10)));
+
 // Add the following lines after parsing the command line arguments
 // Step 3: Create a progress bar instance with a custom format
 const progressBar = new ProgressBar('Generating data [:bar] :percent :etas', {
@@ -55,7 +63,11 @@ const data = [];
 for (let i = 0; i < argv.rows; i++) {
   const row = [];
   for (let j = 0; j < headers.length; j++) {
-    row.push(Math.random().toString(36).slice(-10));
+    if (numberColumns.has(j)) {
+      row.push(Math.floor(Math.random() * 10000)); // Generate a random number
+    } else {
+      row.push(Math.random().toString(36).slice(-10)); // Generate a random string
+    }
   }
   data.push(row);
   progressBar.tick(); // Update the progress bar
