@@ -30,7 +30,7 @@ const argv = yargs(hideBin(process.argv))
 function generateData(type) {
   switch (type) {
     case 'int':
-      return Math.floor(Math.random() * 10000);
+      return Math.floor(Math.random() * 10000)+1;
     case 'String':
       return Math.random().toString(36).slice(-10);
     default:
