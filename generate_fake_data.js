@@ -24,15 +24,19 @@ const argv = yargs(hideBin(process.argv))
     description: 'Output XLSX file path',
     type: 'string',
     demandOption: true
-  })
-  .option('f', {
-    alias: 'number-columns',
-    description: 'Array of 0-indexed column indexes for generating number data',
-    type: 'array',
-    default: []
   }).argv;
-  // Step 2: Parse the input column indexes and store them in a Set
-const numberColumns = new Set(argv.f.map(index => parseInt(index, 10)));
+
+  // Step 2: Create a generateData() function that generates data based on the provided type
+function generateData(type) {
+  switch (type) {
+    case 'int':
+      return Math.floor(Math.random() * 10000);
+    case 'String':
+      return Math.random().toString(36).slice(-10);
+    default:
+      return type; // Returns a custom string value
+  }
+}
 
 // Add the following lines after parsing the command line arguments
 // Step 3: Create a progress bar instance with a custom format
@@ -56,23 +60,25 @@ for (let col = range.s.c; col <= range.e.c; ++col) {
   const cell = worksheet[XLSX.utils.encode_cell({ c: col, r: range.s.r })];
   headers.push(cell ? cell.v : '');
 }
-
+// Step 1: Read the second row of the input XLSX for data type information
+const dataTypes = [];
+for (let col = range.s.c; col <= range.e.c; ++col) {
+  const cell = worksheet[XLSX.utils.encode_cell({ c: col, r: range.s.r + 1 })];
+  dataTypes.push(cell ? cell.v : 'String'); // Default to 'String' if undefined
+}
 // Modify the data generation loop in Step 5
 // Step 4: Update the progress bar while generating fake data
 const data = [];
+// Modify the data generation loop in Step 5
+// Step 3: Generate data based on the specified type for each column
 for (let i = 0; i < argv.rows; i++) {
   const row = [];
   for (let j = 0; j < headers.length; j++) {
-    if (numberColumns.has(j)) {
-      row.push(Math.floor(Math.random() * 10000)); // Generate a random number
-    } else {
-      row.push(Math.random().toString(36).slice(-10)); // Generate a random string
-    }
+    row.push(generateData(dataTypes[j]));
   }
   data.push(row);
   progressBar.tick(); // Update the progress bar
 }
-
 // Step 6: Create a new XLSX file with the generated data
 const newWorksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
 const newWorkbook = XLSX.utils.book_new();
